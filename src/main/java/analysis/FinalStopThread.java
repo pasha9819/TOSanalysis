@@ -15,7 +15,7 @@ import java.util.List;
 public class FinalStopThread extends Thread {
     private Integer KS_ID;
 
-    public FinalStopThread(Integer KS_ID) {
+    FinalStopThread(Integer KS_ID) {
         this.KS_ID = KS_ID;
         setName("stop " + KS_ID + " thread");
         setDaemon(true);
@@ -36,11 +36,9 @@ public class FinalStopThread extends Thread {
         while (true){
             try{
 
-                //IOUtil.println("--------------------------------------------------------------------------");
                 List<ArrivalToStop> list = API.getFirstArrivalToStop(new Stop(KS_ID));
                 List<String> temp = new ArrayList<>();
                 for (ArrivalToStop arrival : list){
-                    //IOUtil.println(arrival.remainingLength + " + " + (arrival.spanLength - arrival.remainingLength));
                     if (arrival.remainingLength > 50 && arrival.spanLength - arrival.remainingLength > 50) {
                         continue;
                     }
@@ -51,16 +49,15 @@ public class FinalStopThread extends Thread {
                     }
                     b.append(route.getTransportType().toString()).append(' ');
                     b.append(route.getNumber()).append(" маршрута(").append(arrival.stateNumber).append(") ");
-                    //b.append("осталось ").append(arrival.remainingLength).append(" метров до остановки ");
-                    //if (!route.getNumber().equals("13"))
-                      //  continue;
                     Stop stop;
                     if (arrival.spanLength - arrival.remainingLength < 51){
                         stop = arrival.getPrevStop();
+                        b.append("(-").append(arrival.spanLength - arrival.remainingLength).append(')');
                     }else {
                         stop = StopClassifier.findById(arrival.nextStopId);
+                        b.append("(+").append(arrival.remainingLength).append(')');
                     }
-                    b.append("на остановке ");
+                    b.append(" на остановке ");
                     if (stop == null) {
                         continue;
                     }
@@ -75,7 +72,7 @@ public class FinalStopThread extends Thread {
                     b.append("\n");
                     IOUtil.print(b.toString());
                 }
-                Thread.sleep(20000);
+                Thread.sleep(15000);
                 prevList.clear();
                 prevList.addAll(temp);
             }catch (Throwable e){

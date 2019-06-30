@@ -16,4 +16,15 @@ public class RouteClassifier {
             return null;
         return routes.get(index);
     }
+
+    public static Route findByNumber(String number, Route.TransportType type){
+        int index = -1;
+        for (int i = 0; i < routes.size(); i++)
+            if (routes.get(i).getNumber().equals(number) && routes.get(i).getTransportType().equals(type))
+                index = i;
+        if (index == -1)
+            return null;
+        return routes.get(index);
+    }
+
 }

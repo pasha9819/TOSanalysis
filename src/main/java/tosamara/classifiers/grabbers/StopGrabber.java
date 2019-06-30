@@ -25,17 +25,17 @@ public class StopGrabber extends Grabber{
     @Override
     public void update() {
         try {
-            /*String xml = downloadXml();
-            StopList s = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes()), StopList.class);
-            save(s);*/
+            String xml = downloadXml();
+            StopList s = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), StopList.class);
+            save(s);
             try(BufferedReader r = new BufferedReader(new InputStreamReader(
                     new FileInputStream(getPath()), Charset.forName("UTF-8")))){
-                String xml = IOUtil.readFromBuffReader(r);
-                StopList s = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), StopList.class);
+                String xml1 = IOUtil.readFromBuffReader(r);
+                StopList s1 = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), StopList.class);
 
                 StopClassifier.stops = s.getStops();
             }catch (IOException e){
-                System.err.println("RouteClassifier doesn't load");
+                System.err.println("StopClassifier doesn't load");
                 System.exit(-1);
             }
 

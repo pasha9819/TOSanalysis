@@ -1,6 +1,6 @@
 package tosamara.classifiers.xml.stop;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "stop")
 public class Stop {
@@ -11,6 +11,8 @@ public class Stop {
     private String busesMunicipal;
     private String trams;
     private String trolleybuses;
+    private Double latitude;
+    private Double longitude;
 
     public Stop(Integer KS_ID) {
         this.KS_ID = KS_ID;
@@ -73,5 +75,32 @@ public class Stop {
 
     public void setTrolleybuses(String trolleybuses) {
         this.trolleybuses = trolleybuses;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    @Override
+    public String toString() {
+        return "KS_ID=" + KS_ID +
+                "\n, title='" + title + '\'' +
+                "\n, adjacentStreet='" + adjacentStreet + '\'' +
+                "\n, direction='" + direction + '\'' +
+                "\n, busesMunicipal='" + busesMunicipal + '\'' +
+                "\n, trams='" + trams + '\'' +
+                "\n, trolleybuses='" + trolleybuses + '\'';
     }
 }

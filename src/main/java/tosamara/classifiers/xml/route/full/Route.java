@@ -12,9 +12,20 @@ public class Route {
     @XmlType(name = "transportType")
     public static class TransportType{
 
-        private static final Integer BUS = 1;
-        private static final Integer TRAM = 3;
-        private static final Integer TROL = 4;
+        private static final Integer BUS_ID = 1;
+        private static final Integer TRAM_ID = 3;
+        private static final Integer TROL_ID = 4;
+
+        public static final TransportType BUS = new TransportType(BUS_ID);
+        public static final TransportType TRAM = new TransportType(TRAM_ID);
+        public static final TransportType TROL = new TransportType(TROL_ID);
+
+        public TransportType() {
+        }
+
+        public TransportType(Integer id) {
+            this.id = id;
+        }
 
         private Integer id;
 
@@ -28,13 +39,22 @@ public class Route {
 
         @Override
         public String toString() {
-            if (BUS.equals(id))
+            if (BUS_ID.equals(id))
                 return "Автобус";
-            if (TRAM.equals(id))
+            if (TRAM_ID.equals(id))
                 return "Трамвай";
-            if (TROL.equals(id))
+            if (TROL_ID.equals(id))
                 return "Троллейбус";
             return "Неизвестный транспорт";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof TransportType){
+                TransportType type = (TransportType)obj;
+                return type.id.equals(this.id);
+            }
+            return false;
         }
     }
 
