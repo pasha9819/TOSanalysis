@@ -35,7 +35,7 @@ public class StopThread extends Thread {
                 List<ArrivalToStop> list = API.getFirstArrivalToStop(checkedStop);
                 List<ArrivalToStop> temp = new ArrayList<>();
                 for (ArrivalToStop arrival : list){
-                    if (!arrival.isTransportNearStop()){
+                    if (!arrival.isTransportNearSomeStop()){
                         continue;
                     }
                     boolean transportIsMove = true;
@@ -100,7 +100,7 @@ public class StopThread extends Thread {
                 arrival.date.get(Calendar.MINUTE), arrival.date.get(Calendar.SECOND),
                 route.getTransportType().toString(), route.getNumber(), arrival.stateNumber);
         StringBuilder b = new StringBuilder(s);
-        if (arrival.isTransportNearStop()){
+        if (arrival.isTransportNearSomeStop()){
             b.append("на остановке (").append(arrival.remainingLength).append(") ");
         }else {
             b.append("в ").append(arrival.remainingLength).append(" м. до остановки ");

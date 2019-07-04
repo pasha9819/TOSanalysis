@@ -50,7 +50,7 @@ public class ArrivalToStop {
         return null;
     }
 
-    public boolean isTransportNearStop(){
+    public boolean isTransportNearSomeStop(){
         List<Route.Stop> stops = RouteClassifier.findById(KR_ID).getStops();
         if (Objects.equals(nextStopId, stops.get(stops.size() - 1).getKS_ID())){
             return remainingLength < 70 || spanLength - remainingLength < 30;

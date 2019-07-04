@@ -1,15 +1,18 @@
 package accuracy;
 
 
-import accuracy.entity.Accuracy;
+import spring.entity.Accuracy;
 import io.IOUtil;
+import org.springframework.context.ApplicationContext;
+import spring.ApplicationContextHolder;
+import spring.repos.AccuracyRepo;
 import tosamara.classifiers.RouteClassifier;
 import tosamara.classifiers.StopClassifier;
-import tosamara.classifiers.Updater;
 import tosamara.classifiers.xml.route.full.Route;
 import tosamara.classifiers.xml.stop.Stop;
 import tosamara.methods.API;
 import tosamara.methods.json.ArrivalToStop;
+import tosamara.methods.json.Transport;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -18,12 +21,19 @@ import java.util.*;
 public class StopThread extends Thread {
     private Stop checkedStop;
     private HashMap<Integer, ArrayList<Accuracy>> map;
+    private final ApplicationContext ctx;
 
-    public StopThread(Integer KS_ID) {
+    private AccuracyRepo accuracyRepo;
+
+
+    public StopThread(Integer KS_ID ) {
         checkedStop = StopClassifier.findById(KS_ID);
         setName("accuracy " + KS_ID + " stop thread");
         setDaemon(true);
         map = new HashMap<>();
+        ctx = ApplicationContextHolder.getApplicationContext();
+        accuracyRepo = ctx.getBean(AccuracyRepo.class);
+        System.out.println("\n\n\n\n\n" + accuracyRepo + "\n\n\n\n");
     }
 
     @Override
@@ -32,27 +42,63 @@ public class StopThread extends Thread {
         while (true){
             try{
 
-                List<ArrivalToStop> list = API.getFirstArrivalToStop(checkedStop);
-                for (ArrivalToStop arrival : list){
-                    if (!map.containsKey(arrival.hullNo)){
+                List<ArrivalToStop> arrivalList = API.getFirstArrivalToStop(checkedStop);
+                List<Transport> transports;
+                transports = API.getSurroundingTransports(checkedStop.getLatitude(), checkedStop.getLongitude());
+
+                List<Integer> hullNoArrivalList = new ArrayList<>();
+                List<Integer> deleteList = new ArrayList<>();
+
+                for (ArrivalToStop arrival : arrivalList) {
+                    hullNoArrivalList.add(arrival.hullNo);
+                }
+
+                for(Integer i : map.keySet()){
+                    if (!hullNoArrivalList.contains(i)){
+                        boolean offTheRoute = true;
+                        for (Transport tr : transports){
+                            if (Objects.equals(tr.hullNo, i)){
+                                ArrivalToStop arr = new ArrivalToStop();
+                                arr.remainingLength = 0d;
+                                arr.nextStopId = checkedStop.getKS_ID();
+                                arr.stop = checkedStop;
+                                arr.date = new GregorianCalendar();
+                                arr.stateNumber = tr.stateNumber;
+                                arr.hullNo = tr.hullNo;
+                                arr.KR_ID = tr.KR_ID;
+                                arr.timeInSeconds = 0d;
+                                arrivalList.add(arr);
+                                offTheRoute = false;
+                            }
+                        }
+                        if (offTheRoute){
+                            deleteList.add(i);
+                        }
+                    }
+                }
+                for (Integer hullNo : deleteList){
+                    map.remove(hullNo);
+                }
+                for (ArrivalToStop arrival : arrivalList) {
+                    hullNoArrivalList.add(arrival.hullNo);
+                    if (!map.containsKey(arrival.hullNo)) {
                         map.put(arrival.hullNo, new ArrayList<>());
                     }
                     ArrayList<Accuracy> array = map.get(arrival.hullNo);
 
-                    IOUtil.println(transportPositionToString(arrival));
+                    String str = transportPositionToString(arrival);
+                    if (str != null){
+                        IOUtil.println(str);
+                    }
 
-                    if (arrival.remainingLength < 100 && Objects.equals(arrival.nextStopId, checkedStop.getKS_ID())){
-                        //
-                        if(array.isEmpty()){
-                            continue;
-                        }
+                    if (arrival.isTransportNearSomeStop() && Objects.equals(arrival.nextStopId, checkedStop.getKS_ID())) {
                         String s = String.format("Route = %d, StateNumber = %s", arrival.KR_ID, arrival.stateNumber);
                         IOUtil.println(s);
-                        for (Accuracy a : array){
-                            // 30 - amendment (because we use arrival.remainingLength < 100)
-                            a.setRealtime((new java.util.Date().getTime() - a.getTime().getTime()) / 1000.0 + 30);
+                        for (Accuracy a : array) {
+                            a.setRealtime((new java.util.Date().getTime() - a.getTime().getTime()) / 1000.0);
                             s = String.format("%4.0f %5s %4.0f", a.getForecast(), "", a.getRealtime());
                             IOUtil.println(s);
+                            accuracyRepo.save(a);
                         }
                         map.remove(arrival.hullNo);
                         continue;
@@ -66,15 +112,16 @@ public class StopThread extends Thread {
                     accuracy.setTime(new Time(arrival.date.getTimeInMillis()));
                     array.add(accuracy);
                 }
+
                 Thread.sleep(15000);
             }catch (Throwable e){
-                System.err.println(e.toString());
+                e.printStackTrace();
             }
 
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         Updater.update(false);
         int[] stopsId = new int[]{218};
@@ -85,8 +132,11 @@ public class StopThread extends Thread {
         while (true){
             Thread.yield();
         }
-    }
+    }*/
     private  String transportPositionToString(ArrivalToStop arrival){
+        if (arrival.timeInSeconds > 120){
+            return null;
+        }
         Route route = RouteClassifier.findById(arrival.KR_ID);
         if (route == null){
             return "Маршрут не определен";
@@ -96,7 +146,7 @@ public class StopThread extends Thread {
                 arrival.date.get(Calendar.MINUTE), arrival.date.get(Calendar.SECOND),
                 route.getTransportType().toString(), route.getNumber(), arrival.stateNumber);
         StringBuilder b = new StringBuilder(s);
-        if (arrival.isTransportNearStop()){
+        if (arrival.isTransportNearSomeStop()){
             b.append("на остановке (").append(arrival.remainingLength).append(") ");
         }else {
             b.append("в ").append(arrival.remainingLength).append(" м. до остановки ");

@@ -24,8 +24,9 @@ public class Updater {
         for (Grabber g : grabbers) {
             start = System.currentTimeMillis();
             g.update();
-            System.out.println("Update with " + g.getClass().getSimpleName() + ' ' +
-                    (System.currentTimeMillis() - start) + "ms");
+            System.out.print("Update with " + g.getClass().getSimpleName() + ' ' +
+                    (System.currentTimeMillis() - start) + "ms  ");
+            System.out.println(Thread.currentThread().getName());
         }
     }
 }

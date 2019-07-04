@@ -1,5 +1,6 @@
 package spring;
 
+import accuracy.StopThread;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import tosamara.classifiers.Updater;
@@ -8,8 +9,8 @@ import tosamara.classifiers.Updater;
 public class Application {
 
     public static void main(String[] args) {
-        Updater.update(false);
         SpringApplication.run(Application.class, args);
+
     }
 
 }

@@ -1,24 +1,38 @@
 package spring.controllers;
 
+import spring.repos.AccuracyRepo;
+import accuracy.StopThread;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import tosamara.classifiers.RouteClassifier;
 import tosamara.classifiers.StopClassifier;
+import tosamara.classifiers.Updater;
 import tosamara.classifiers.xml.route.full.Route;
-import tosamara.classifiers.xml.stop.Stop;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import static tosamara.classifiers.xml.route.full.Route.TransportType.*;
 
 @Controller
 public class MainController {
+
+    private final AccuracyRepo accuracyRepo;
+
+    @Autowired
+    public MainController(AccuracyRepo accuracyRepo) {
+        Updater.update(false);
+        this.accuracyRepo = accuracyRepo;
+        int[] stopsId = new int[]{872, 222, 218, 813, 1159, 1740, 329};
+        for (int id : stopsId) {
+            StopThread t = new StopThread(id);
+            t.start();
+        }
+    }
+
+
+
 
     @GetMapping("/stop")
     public String stopInfo(
