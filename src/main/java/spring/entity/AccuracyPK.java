@@ -1,12 +1,13 @@
-package accuracy.entity;
+package spring.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.Objects;
 
-public class AccuracyPK {
+public class AccuracyPK implements Serializable {
     private long hullNo;
     private Date date;
     private Time time;

@@ -1,9 +1,8 @@
-package accuracy.entity;
+package spring.entity;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -22,7 +21,7 @@ public class Accuracy {
     }
 
     @Id
-    @Column(name = "hullNo", nullable = false)
+    @Column(name = "hull_no", nullable = false)
     public long getHullNo() {
         return hullNo;
     }
@@ -51,7 +50,7 @@ public class Accuracy {
         this.time = time;
     }
 
-    @Column(name = "routeId", nullable = false)
+    @Column(name = "route_id", nullable = false)
     public long getRouteId() {
         return routeId;
     }
@@ -60,7 +59,7 @@ public class Accuracy {
         this.routeId = routeId;
     }
 
-    @Column(name = "stopId", nullable = false)
+    @Column(name = "stop_id", nullable = false)
     public long getStopId() {
         return stopId;
     }
