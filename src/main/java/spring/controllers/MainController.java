@@ -31,45 +31,16 @@ public class MainController {
 
     @ResponseBody
     @GetMapping(path = "/analysis", produces = MediaType.TEXT_HTML_VALUE)
-    public String getRouteList(
-            @RequestParam(name = "stop_id")
-            Integer id,
-            Model model){
+    public String getRouteList(@RequestParam(name = "stop_id") Integer id){
         if (id == null){
             return "";
         }
-        Stop stop = StopClassifier.findById(id);
-        if (stop == null){
-            return "";
-        }
-        String[] busNumbers = stop.getBusesMunicipal().split(", ");
-        String[] tramNumbers = stop.getTrams().split(", ");
-        String[] trolNumbers = stop.getTrolleybuses().split(", ");
-
-        List<Route> routes = new ArrayList<>();
-        for(String s : busNumbers){
-            Route r = RouteClassifier.findByNumber(s, BUS);
-            if (r != null){
-                routes.add(r);
-            }
-        }
-        for(String s : tramNumbers){
-            Route r = RouteClassifier.findByNumber(s, TRAM);
-            if (r != null){
-                routes.add(r);
-            }
-        }
-        for(String s : trolNumbers){
-            Route r = RouteClassifier.findByNumber(s, TROL);
-            if (r != null){
-                routes.add(r);
-            }
-        }
+        List<Route> routes = StopClassifier.getRoutesByStopId(id);
         if (routes.isEmpty()){
             return "";
         }
         StringBuilder b = new StringBuilder();
-        // <option value="2">Пункт 2</option>
+        // <option value="v">route number</option>
         for (Route r : routes){
             b.append("<option value=\"").append(r.getKR_ID()).append("\">");
             b.append(r.getNumber()).append(" ").append(r.getTransportType().toString());

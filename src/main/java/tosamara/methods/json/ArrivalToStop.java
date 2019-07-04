@@ -8,6 +8,7 @@ import tosamara.classifiers.xml.stop.Stop;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Objects;
 
 public class ArrivalToStop {
     public Calendar date = new GregorianCalendar();
@@ -17,6 +18,8 @@ public class ArrivalToStop {
     public Integer nextStopId;
     public Double spanLength;
     public Double remainingLength;
+    public Double timeInSeconds;
+    public Stop stop;
 
     @Override
     public String toString() {
@@ -28,7 +31,7 @@ public class ArrivalToStop {
         return b.toString();
     }
 
-    public Integer getPrevStopID(){
+    private Integer getPrevStopID(){
         Route route = RouteClassifier.findById(KR_ID);
         if (route == null) {
             return null;
@@ -47,7 +50,13 @@ public class ArrivalToStop {
         return null;
     }
 
-    public boolean isTransportOnStop(){
-        return remainingLength > 50 && spanLength - remainingLength > 50;
+    public boolean isTransportNearStop(){
+        List<Route.Stop> stops = RouteClassifier.findById(KR_ID).getStops();
+        if (Objects.equals(nextStopId, stops.get(stops.size() - 1).getKS_ID())){
+            return remainingLength < 70 || spanLength - remainingLength < 30;
+        }
+        return remainingLength < 50 || spanLength - remainingLength < 30;
     }
+
+
 }

@@ -21,4 +21,12 @@ public class IOUtil {
     public static synchronized void print(Object o){
         System.out.print(o);
     }
+
+    public static synchronized void println(String str){
+        System.out.println(str);
+    }
+
+    public static synchronized void println(Object o){
+        System.out.println(o);
+    }
 }

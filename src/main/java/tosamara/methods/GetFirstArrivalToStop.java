@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import network.Request;
 import network.GetRequestBuilder;
+import tosamara.classifiers.StopClassifier;
+import tosamara.classifiers.xml.stop.Stop;
 import tosamara.util.TokenGenerator;
 import tosamara.methods.json.ArrivalToStop;
 
@@ -36,6 +38,24 @@ public class GetFirstArrivalToStop implements Method {
         String answer = r.getAnswer();
         //System.out.println(System.currentTimeMillis() - start);
         ListWrapper wrapper = new Gson().fromJson(answer, ListWrapper.class);
+        for (ArrivalToStop a : wrapper.getArrivalList()){
+            Stop stop;
+            /*
+                If transport near the previous stop, then change next stop to previous stop
+                it is need, because forecast are late and stops - it is point on map,
+                but public transport is not point.
+                Also, average update of data on ToSamaraServer = 30 sec, and transport can
+                drive the stop in less than 30 seconds.
+             */
+            if (a.spanLength - a.remainingLength < 51){
+                stop = a.getPrevStop();
+                a.remainingLength = a.remainingLength - a.spanLength;
+                a.nextStopId = stop.getKS_ID();
+            }else {
+                stop = StopClassifier.findById(a.nextStopId);
+            }
+            a.stop = stop;
+        }
         return wrapper.getArrivalList();
     }
 

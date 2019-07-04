@@ -12,14 +12,14 @@ import java.util.*;
 
 import static java.lang.Math.abs;
 
-public class CheckStopThread extends Thread {
-    private Stop chekedStop;
+public class StopThread extends Thread {
+    private Stop checkedStop;
     private Timer timer;
     private volatile List<ArrivalToStop> prevList = new ArrayList<>();
 
-    CheckStopThread(Integer KS_ID) {
-        chekedStop = StopClassifier.findById(KS_ID);
-        setName("chekedStop " + KS_ID + " thread");
+    StopThread(Integer KS_ID) {
+        checkedStop = StopClassifier.findById(KS_ID);
+        setName("checkedStop " + KS_ID + " thread");
         setDaemon(true);
         // timer - daemon
         timer = new Timer(true);
@@ -32,7 +32,7 @@ public class CheckStopThread extends Thread {
         while (true){
             try{
 
-                List<ArrivalToStop> list = API.getFirstArrivalToStop(chekedStop);
+                List<ArrivalToStop> list = API.getFirstArrivalToStop(checkedStop);
                 List<ArrivalToStop> temp = new ArrayList<>();
                 for (ArrivalToStop arrival : list){
                     if (!arrival.isTransportNearStop()){
@@ -40,7 +40,7 @@ public class CheckStopThread extends Thread {
                     }
                     boolean transportIsMove = true;
                     for(ArrivalToStop arr : prevList){
-                        // If transport stay near the chekedStop, we will not work with this transport.
+                        // If transport stay near the checkedStop, we will not work with this transport.
 
                         if (Objects.equals(arrival.hullNo, arr.hullNo)
                             && dateDifference(arrival.date, arr.date) < 5 * 60 * 1000
@@ -90,17 +90,17 @@ public class CheckStopThread extends Thread {
         }
     }
 
-    private String transportPositionToString(ArrivalToStop arrival){
+    private  String transportPositionToString(ArrivalToStop arrival){
         Route route = RouteClassifier.findById(arrival.KR_ID);
         if (route == null){
             return "Маршрут не определен";
         }
         String s = String.format("%4.0f  с. до ост. %25s -> %02d:%02d:%02d %10s %3s  маршрута (%s) ",
-                arrival.timeInSeconds, chekedStop.getTitle(), arrival.date.get(Calendar.HOUR_OF_DAY),
+                arrival.timeInSeconds, checkedStop.getTitle(), arrival.date.get(Calendar.HOUR_OF_DAY),
                 arrival.date.get(Calendar.MINUTE), arrival.date.get(Calendar.SECOND),
                 route.getTransportType().toString(), route.getNumber(), arrival.stateNumber);
         StringBuilder b = new StringBuilder(s);
-        if (abs(arrival.remainingLength) < 50){
+        if (arrival.isTransportNearStop()){
             b.append("на остановке (").append(arrival.remainingLength).append(") ");
         }else {
             b.append("в ").append(arrival.remainingLength).append(" м. до остановки ");

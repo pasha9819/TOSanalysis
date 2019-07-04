@@ -27,9 +27,9 @@ public class Main {
         }
         System.out.println(System.currentTimeMillis() - start);*/
 
-        int[] stopsId = new int[]{813/*, 170*/};
+        int[] stopsId = new int[]{186, 170, 813};
         for (int id : stopsId) {
-            FinalStopThread t = new FinalStopThread(id);
+            StopThread t = new StopThread(id);
             t.start();
         }
         while (c != COUNT){

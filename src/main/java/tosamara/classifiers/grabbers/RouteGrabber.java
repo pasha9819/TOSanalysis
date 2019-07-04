@@ -13,6 +13,7 @@ import javax.xml.bind.JAXB;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -64,7 +65,11 @@ public class RouteGrabber extends Grabber {
                     new FileInputStream(getPath()), Charset.forName("UTF-8")))){
                 String xml = IOUtil.readFromBuffReader(r);
                 routeList = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), RouteList.class);
-                RouteClassifier.routes = routeList.getRoutes();
+                HashMap<Integer, Route> routeMap = new HashMap<>();
+                for (Route route : routeList.getRoutes()){
+                    routeMap.put(route.getKR_ID(), route);
+                }
+                RouteClassifier.routes = routeMap;
             }catch (IOException e){
                 System.err.println("RouteClassifier doesn't load");
                 System.exit(-1);
