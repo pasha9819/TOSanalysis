@@ -18,7 +18,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 
-public class StopThread extends Thread {
+public class AccuracyThread extends Thread {
+    public static final int[] observed = new int[]{872, 222, 218, 813, 1159, 1740, 329};
     private Stop checkedStop;
     private HashMap<Integer, ArrayList<Accuracy>> map;
     private final ApplicationContext ctx;
@@ -26,7 +27,7 @@ public class StopThread extends Thread {
     private AccuracyRepo accuracyRepo;
 
 
-    public StopThread(Integer KS_ID ) {
+    public AccuracyThread(Integer KS_ID ) {
         checkedStop = StopClassifier.findById(KS_ID);
         setName("accuracy " + KS_ID + " stop thread");
         setDaemon(true);
@@ -86,18 +87,18 @@ public class StopThread extends Thread {
                     }
                     ArrayList<Accuracy> array = map.get(arrival.hullNo);
 
-                    String str = transportPositionToString(arrival);
+                    /*String str = transportPositionToString(arrival);
                     if (str != null){
                         IOUtil.println(str);
-                    }
+                    }*/
 
                     if (arrival.isTransportNearSomeStop() && Objects.equals(arrival.nextStopId, checkedStop.getKS_ID())) {
-                        String s = String.format("Route = %d, StateNumber = %s", arrival.KR_ID, arrival.stateNumber);
+                        /*String s = String.format("Route = %d, StateNumber = %s", arrival.KR_ID, arrival.stateNumber);
                         IOUtil.println(s);
-                        for (Accuracy a : array) {
+*/                        for (Accuracy a : array) {
                             a.setRealtime((new java.util.Date().getTime() - a.getTime().getTime()) / 1000.0);
-                            s = String.format("%4.0f %5s %4.0f", a.getForecast(), "", a.getRealtime());
-                            IOUtil.println(s);
+                            /*s = String.format("%4.0f %5s %4.0f", a.getForecast(), "", a.getRealtime());
+                            IOUtil.println(s);*/
                             accuracyRepo.save(a);
                         }
                         map.remove(arrival.hullNo);
@@ -126,7 +127,7 @@ public class StopThread extends Thread {
         Updater.update(false);
         int[] stopsId = new int[]{218};
         for (int id : stopsId) {
-            StopThread t = new StopThread(id);
+            AccuracyThread t = new AccuracyThread(id);
             t.start();
         }
         while (true){

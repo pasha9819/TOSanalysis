@@ -67,7 +67,9 @@ public class RouteGrabber extends Grabber {
                 routeList = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), RouteList.class);
                 HashMap<Integer, Route> routeMap = new HashMap<>();
                 for (Route route : routeList.getRoutes()){
-                    routeMap.put(route.getKR_ID(), route);
+                    if (route.getAffiliationID() == 1){
+                        routeMap.put(route.getKR_ID(), route);
+                    }
                 }
                 RouteClassifier.routes = routeMap;
             }catch (IOException e){

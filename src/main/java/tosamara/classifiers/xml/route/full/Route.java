@@ -136,4 +136,13 @@ public class Route {
     public void setStops(List<Stop> stops) {
         this.stops = stops;
     }
+
+    @XmlTransient
+    public List<Integer> getStopIdList(){
+        List<Integer> stopIdList = new ArrayList<>();
+        for(Route.Stop s : getStops()){
+            stopIdList.add(s.KS_ID);
+        }
+        return stopIdList;
+    }
 }

@@ -2,6 +2,7 @@ package tosamara.classifiers;
 
 import tosamara.classifiers.xml.route.full.Route;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,13 +13,14 @@ public class RouteClassifier {
         return routes.get(KR_ID);
     }
 
-    public static Route findByNumber(String number, Route.TransportType type){
+    public static List<Route> findByNumber(String number, Route.TransportType type){
+        List<Route> routeList = new ArrayList<>();
         for (Route r : routes.values()) {
             if (r.getNumber().equals(number) && r.getTransportType().equals(type)) {
-                return r;
+                routeList.add(r);
             }
         }
-        return null;
+        return routeList;
     }
 
 }

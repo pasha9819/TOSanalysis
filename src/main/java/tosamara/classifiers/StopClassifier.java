@@ -33,9 +33,11 @@ public class StopClassifier {
 
         for (int i = 0; i < numbers.length; i++) {
             for(String s : numbers[i]){
-                Route r = RouteClassifier.findByNumber(s, types[i]);
-                if (r != null){
-                    routes.add(r);
+                List<Route> routeList = RouteClassifier.findByNumber(s, types[i]);
+                for (Route r: routeList){
+                    if (r.getStopIdList().contains(KS_ID)){
+                        routes.add(r);
+                    }
                 }
             }
         }
