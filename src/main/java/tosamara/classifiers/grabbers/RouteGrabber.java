@@ -1,83 +1,61 @@
 package tosamara.classifiers.grabbers;
 
-import io.IOUtil;
 import tosamara.Configuration;
 import tosamara.classifiers.RouteClassifier;
-import tosamara.classifiers.xml.route.full.LastStops;
+import tosamara.classifiers.parsers.RouteParser;
+import tosamara.classifiers.parsers.SimpleRouteParser;
 import tosamara.classifiers.xml.route.full.Route;
-import tosamara.classifiers.xml.route.full.RouteList;
+import tosamara.classifiers.xml.route.full.Routes;
 import tosamara.classifiers.xml.route.simple.SimpleRoute;
-import tosamara.classifiers.xml.route.simple.SimpleRouteList;
+import tosamara.classifiers.xml.route.simple.SimpleRoutes;
 
 import javax.xml.bind.JAXB;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 
 public class RouteGrabber extends Grabber {
     @Override
-    String getURL() {
+    protected String getURL() {
         return Configuration.ROUTES_CLASSIFIER_URL;
     }
 
     @Override
-    String getPath() {
+    protected String getPath() {
         return Configuration.ROUTES_CLASSIFIER_PATH;
     }
 
     @Override
-    public void update() {
+    public void updateAndLoad() {
         try {
-            RouteList routeList;
-            /*SimpleRouteList simpleList = new SimpleRouteGrabber().download();
+            new SimpleRouteGrabber().updateAndLoad();
+            SimpleRoutes simpleList = new SimpleRouteParser().parseFromFile();
 
-            String xml = downloadXml();
-            routeList = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes()), RouteList.class);
+            Routes routes;
+            try{
+                String xml = downloadXml();
+                routes = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), Routes.class);
+            }catch (Exception e){
+                System.err.println("Couldn't load Routes info from tosamara.ru! [Data was loaded from local sources]");
+                routes = new RouteParser().parseFromFile();
+            }
 
-            for (Route route : routeList.getRoutes()){
+            HashMap<Integer, Route> routeMap = new HashMap<>();
+
+            for (Route route : routes.getList()){
                 SimpleRoute s = simpleList.getByKR_ID(route.getKR_ID());
                 route.setAffiliationID(s.getAffiliationID());
-            }
-
-            save(routeList);
-
-
-            LastStops ls = new LastStops();
-            HashSet<Route.Stop> uniqueStops = new HashSet<>();
-
-            for(Route r : routeList.getRoutes()){
-                // TODO: 10.06.2019 1 == MUNICIPAL !!!
-                if (!r.getAffiliationID().equals(1)){
-                    continue;
+                // 1 == MUNICIPAL
+                if (route.getAffiliationID() == 1){
+                    routeMap.put(route.getKR_ID(), route);
                 }
-                List<Route.Stop> routeStops = r.getStops();
-                Route.Stop last = routeStops.get(routeStops.size() - 1);
-                uniqueStops.add(last);
             }
-
-            ls.setStops(new ArrayList<>(uniqueStops));
-
-            save(ls, Configuration.LAST_STOPS_CLASSIFIER_PATH);*/
-            try(BufferedReader r = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(getPath()), Charset.forName("UTF-8")))){
-                String xml = IOUtil.readFromBuffReader(r);
-                routeList = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), RouteList.class);
-                HashMap<Integer, Route> routeMap = new HashMap<>();
-                for (Route route : routeList.getRoutes()){
-                    if (route.getAffiliationID() == 1){
-                        routeMap.put(route.getKR_ID(), route);
-                    }
-                }
-                RouteClassifier.routes = routeMap;
-            }catch (IOException e){
-                System.err.println("RouteClassifier doesn't load");
-                System.exit(-1);
-            }
+            save(routes);
+            RouteClassifier.routes = routeMap;
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Couldn't update and load Route info");
+            System.exit(-1);
         }
     }
 }

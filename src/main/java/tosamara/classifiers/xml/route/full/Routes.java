@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "routes")
-public class RouteList {
+public class Routes {
     @XmlElement(name = "route")
-    private List<Route> routes = new ArrayList<>();
+    private List<Route> list = new ArrayList<>();
 
     @XmlTransient
-    public List<Route> getRoutes() {
-        return routes;
+    public List<Route> getList() {
+        return list;
     }
 
-    public void setRoutes(List<Route> routes) {
-        this.routes = routes;
+    public void setList(List<Route> list) {
+        this.list = list;
     }
 }

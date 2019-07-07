@@ -1,6 +1,5 @@
 package tosamara.methods;
 
-
 import tosamara.classifiers.xml.stop.Stop;
 import tosamara.methods.json.ArrivalToStop;
 import tosamara.methods.json.Transport;
@@ -19,7 +18,7 @@ public abstract class API {
     }
 
     public static List<Transport> getSurroundingTransports(Double latitude, Double longitude){
-        return getSurroundingTransports(latitude, longitude, 50, 100);
+        return getSurroundingTransports(latitude, longitude, 80, 100);
     }
 
     public static List<Transport> getSurroundingTransports(Double latitude, Double longitude, Integer radius, Integer count){

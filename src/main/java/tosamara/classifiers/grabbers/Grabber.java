@@ -8,13 +8,13 @@ import java.io.File;
 
 public abstract class Grabber {
 
-    abstract String getURL();
+    protected abstract String getURL();
 
-    abstract String getPath();
+    protected abstract String getPath();
 
-    public abstract void update();
+    public abstract void updateAndLoad();
 
-    String downloadXml() throws NoSuchMethodException {
+    protected String downloadXml() throws NoSuchMethodException {
         String url = getURL();
         if (url == null) {
             throw new NoSuchMethodException("getURL() is not defined");
@@ -23,7 +23,7 @@ public abstract class Grabber {
         return r.getAnswer();
     }
 
-    void save(Object xmlObject) throws NoSuchMethodException {
+    protected void save(Object xmlObject) throws NoSuchMethodException {
         String path = getPath();
         if (path == null) {
             throw new NoSuchMethodException("getPath() is not defined");
@@ -31,7 +31,7 @@ public abstract class Grabber {
         save(xmlObject, path);
     }
 
-    void save(Object xmlObject, String path){
+    protected void save(Object xmlObject, String path){
         JAXB.marshal(xmlObject, new File(path));
     }
 

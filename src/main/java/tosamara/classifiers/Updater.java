@@ -23,8 +23,8 @@ public class Updater {
         long start;
         for (Grabber g : grabbers) {
             start = System.currentTimeMillis();
-            g.update();
-            System.out.print("Update with " + g.getClass().getSimpleName() + ' ' +
+            g.updateAndLoad();
+            System.out.print("Update " + g.getClass().getSimpleName() + ' ' +
                     (System.currentTimeMillis() - start) + "ms  ");
             System.out.println(Thread.currentThread().getName());
         }

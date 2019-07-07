@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "routes")
-public class SimpleRouteList {
+public class SimpleRoutes {
     @XmlElement(name = "route")
     private List<SimpleRoute> list = new ArrayList<>();
 

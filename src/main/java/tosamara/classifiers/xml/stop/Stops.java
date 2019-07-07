@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "stops")
-public class StopList {
+public class Stops {
     @XmlElement(name = "stop")
-    private List<Stop> stops = new ArrayList<>();
+    private List<Stop> list = new ArrayList<>();
 
     @XmlTransient
-    public List<Stop> getStops() {
-        return stops;
+    public List<Stop> getList() {
+        return list;
     }
 
-    public void setStops(List<Stop> stops) {
-        this.stops = stops;
+    public void setList(List<Stop> list) {
+        this.list = list;
     }
 }

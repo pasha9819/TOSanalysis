@@ -1,16 +1,15 @@
 package spring.controllers;
 
-import accuracy.AccuracyThread;
+import accuracy.AccuracyTimer;
 import accuracy.DataPoint;
-import spring.entity.Accuracy;
-import spring.repos.AccuracyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import spring.entity.Accuracy;
+import spring.repos.AccuracyRepo;
 import tosamara.classifiers.RouteClassifier;
 import tosamara.classifiers.StopClassifier;
 import tosamara.classifiers.Updater;
@@ -23,6 +22,7 @@ import java.util.TimeZone;
 
 @Controller
 public class MainController {
+    private static final int[] observed = new int[]{872, 222, 218, 813, 1159, 1740, 329};
 
     private final AccuracyRepo accuracyRepo;
 
@@ -30,19 +30,14 @@ public class MainController {
     public MainController(AccuracyRepo accuracyRepo) {
         Updater.update(false);
         this.accuracyRepo = accuracyRepo;
-        for (int id : AccuracyThread.observed) {
-            AccuracyThread t = new AccuracyThread(id);
-            t.start();
+        try{
+            for (int id : observed) {
+                AccuracyTimer t = new AccuracyTimer(id);
+                t.start();
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
-    }
-
-    @GetMapping("/stop")
-    public String stopInfo(
-            @RequestParam(name="id", defaultValue = "1")
-            Integer id,
-            Model model) {
-        model.addAttribute("stop", StopClassifier.findById(id));
-        return "stop";
     }
 
     @ResponseBody
@@ -51,9 +46,7 @@ public class MainController {
         if (id == null){
             return "";
         }
-        List<Route> routes;
-        //routes = StopClassifier.getRoutesByStopId(id);
-        routes = new ArrayList<>();
+        List<Route> routes = new ArrayList<>();
         List<Long> routeIdList = accuracyRepo.selectDistinctRoutesByStopId(id);
         for (Long l : routeIdList){
             Integer routeId = Math.toIntExact(l);
@@ -77,7 +70,7 @@ public class MainController {
     public String getObservedStops(){
         StringBuilder b = new StringBuilder();
         // <option value="v">stop name</option>
-        for (Integer id : AccuracyThread.observed){
+        for (Integer id : observed){
             b.append("<option value=\"").append(id).append("\">");
             b.append(StopClassifier.findById(id).getTitle());
             b.append("</option>\n");
@@ -92,23 +85,19 @@ public class MainController {
             @RequestParam(name = "route_id") Integer routeId,
             @RequestParam(name = "start") String startStr,
             @RequestParam(name = "end") String endStr){
-        DataPoint.ListWrapper answer = new DataPoint.ListWrapper();
-        if (stopId == null || routeId == null || startStr == null || endStr == null){
-            return answer.getPoints();
-        }
+
         Time start = parseTime(startStr);
         Time end = parseTime(endStr);
+        if (stopId == null || routeId == null || start == null || end == null){
+            return new ArrayList<>();
+        }
+
         List<Accuracy> accuracyList = accuracyRepo.findByRouteIdAndStopIdAndTimeBetween(routeId, stopId, start, end);
-        //accuracyList = accuracyRepo.findByStopId(stopId);
 
         List<DataPoint> data = new ArrayList<>(accuracyList.size());
-        double x,y;
         for (Accuracy a : accuracyList){
-            x = a.getRealtime();
-            y = a.getForecast() - x;
-            data.add(new DataPoint(x,y));
+            data.add(new DataPoint(a.getRealtime(), a.getForecast()));
         }
-        answer.setPoints(data);
         return data;
     }
 
@@ -128,5 +117,4 @@ public class MainController {
         TimeZone tz = TimeZone.getDefault();
         return new Time(s * 1000 - tz.getRawOffset());
     }
-
 }

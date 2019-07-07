@@ -2,12 +2,12 @@ package tosamara.methods;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import network.Request;
 import network.GetRequestBuilder;
+import network.Request;
 import tosamara.classifiers.StopClassifier;
 import tosamara.classifiers.xml.stop.Stop;
-import tosamara.util.TokenGenerator;
 import tosamara.methods.json.ArrivalToStop;
+import tosamara.util.TokenGenerator;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class GetFirstArrivalToStop implements Method {
     private Integer KS_ID;
     private Integer count;
 
-    public GetFirstArrivalToStop(Integer KS_ID, Integer count) {
+    GetFirstArrivalToStop(Integer KS_ID, Integer count) {
         this.KS_ID = KS_ID;
         this.count = count;
     }
@@ -25,7 +25,7 @@ public class GetFirstArrivalToStop implements Method {
         return TokenGenerator.getToken(KS_ID, count);
     }
 
-    public List<ArrivalToStop> execute() {
+    List<ArrivalToStop> execute() {
         Request r = new GetRequestBuilder(API.SERVER_ADDRESS)
                 .appendParam("method", "getFirstArrivalToStop")
                 .appendParam("KS_ID", KS_ID)
@@ -34,9 +34,8 @@ public class GetFirstArrivalToStop implements Method {
                 .appendParam("clientid", "BelyaevPI")
                 .appendParam("authkey", secretKey())
                 .build();
-        //long start = System.currentTimeMillis();
+
         String answer = r.getAnswer();
-        //System.out.println(System.currentTimeMillis() - start);
         ListWrapper wrapper = new Gson().fromJson(answer, ListWrapper.class);
         for (ArrivalToStop a : wrapper.getArrivalList()){
             Stop stop;
@@ -47,14 +46,14 @@ public class GetFirstArrivalToStop implements Method {
                 Also, average update of data on ToSamaraServer = 30 sec, and transport can
                 drive the stop in less than 30 seconds.
              */
-            if (a.spanLength - a.remainingLength < 51){
+            if (a.getSpanLength() - a.getRemainingLength() < 51){
                 stop = a.getPrevStop();
-                a.remainingLength = a.remainingLength - a.spanLength;
-                a.nextStopId = stop.getKS_ID();
+                a.setRemainingLength(a.getRemainingLength() - a.getSpanLength());
+                a.setNextStopId(stop.getKS_ID());
             }else {
-                stop = StopClassifier.findById(a.nextStopId);
+                stop = StopClassifier.findById(a.getNextStopId());
             }
-            a.stop = stop;
+            a.setStop(stop);
         }
         return wrapper.getArrivalList();
     }
@@ -65,11 +64,6 @@ public class GetFirstArrivalToStop implements Method {
 
         List<ArrivalToStop> getArrivalList() {
             return arrivalList;
-        }
-
-        public ListWrapper setArrivalList(List<ArrivalToStop> arrivalList) {
-            this.arrivalList = arrivalList;
-            return this;
         }
     }
 }

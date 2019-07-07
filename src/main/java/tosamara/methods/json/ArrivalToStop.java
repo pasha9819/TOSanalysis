@@ -11,24 +11,107 @@ import java.util.List;
 import java.util.Objects;
 
 public class ArrivalToStop {
-    public Calendar date = new GregorianCalendar();
-    public String stateNumber;
-    public Integer KR_ID;
-    public Integer hullNo;
-    public Integer nextStopId;
-    public Double spanLength;
-    public Double remainingLength;
-    public Double timeInSeconds;
-    public Stop stop;
 
-    @Override
-    public String toString() {
-        StringBuilder b = new StringBuilder();
-        b.append(" date = ").append(date.getTime());
-        b.append(" KR_ID = ").append(KR_ID);
-        b.append(" hullNo = ").append(hullNo);
-        b.append(" nextStopId = ").append(nextStopId);
-        return b.toString();
+    private Calendar date = new GregorianCalendar();
+    private String stateNumber;
+    private Integer KR_ID;
+    private Integer hullNo;
+    private Integer nextStopId;
+    private Double spanLength;
+    private Double remainingLength;
+    private Double timeInSeconds;
+    /**
+     * This field doesn't exist in JSON-schema.
+     */
+    private Stop stop;
+
+    public ArrivalToStop() {
+    }
+
+
+    public ArrivalToStop(Calendar date, String stateNumber, Integer KR_ID, Integer hullNo,
+                         Integer nextStopId, Double spanLength, Double remainingLength, Double timeInSeconds) {
+        this.date = date;
+        this.stateNumber = stateNumber;
+        this.KR_ID = KR_ID;
+        this.hullNo = hullNo;
+        this.nextStopId = nextStopId;
+        this.spanLength = spanLength;
+        this.remainingLength = remainingLength;
+        this.timeInSeconds = timeInSeconds;
+        this.stop = StopClassifier.findById(nextStopId);
+    }
+
+    public Calendar getDate() {
+        return date;
+    }
+
+    public void setDate(Calendar date) {
+        this.date = date;
+    }
+
+    public String getStateNumber() {
+        return stateNumber;
+    }
+
+    public void setStateNumber(String stateNumber) {
+        this.stateNumber = stateNumber;
+    }
+
+    public Integer getKR_ID() {
+        return KR_ID;
+    }
+
+    public void setKR_ID(Integer KR_ID) {
+        this.KR_ID = KR_ID;
+    }
+
+    public Integer getHullNo() {
+        return hullNo;
+    }
+
+    public void setHullNo(Integer hullNo) {
+        this.hullNo = hullNo;
+    }
+
+    public Integer getNextStopId() {
+        return nextStopId;
+    }
+
+    public void setNextStopId(Integer nextStopId) {
+        this.nextStopId = nextStopId;
+    }
+
+    public Double getSpanLength() {
+        return spanLength;
+    }
+
+    public void setSpanLength(Double spanLength) {
+        this.spanLength = spanLength;
+    }
+
+    public Double getRemainingLength() {
+        return remainingLength;
+    }
+
+    public void setRemainingLength(Double remainingLength) {
+        this.remainingLength = remainingLength;
+    }
+
+    public Double getTimeInSeconds() {
+        return timeInSeconds;
+    }
+
+    public void setTimeInSeconds(Double timeInSeconds) {
+        this.timeInSeconds = timeInSeconds;
+    }
+
+    public Stop getStop() {
+        return stop;
+    }
+
+    public void setStop(Stop stop) {
+        this.stop = stop;
     }
 
     private Integer getPrevStopID(){
