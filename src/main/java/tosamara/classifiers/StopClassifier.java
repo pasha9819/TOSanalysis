@@ -1,6 +1,5 @@
 package tosamara.classifiers;
 
-import tosamara.classifiers.grabbers.StopGrabber;
 import tosamara.classifiers.parsers.StopParser;
 import tosamara.classifiers.xml.stop.Stop;
 import tosamara.classifiers.xml.stop.Stops;
