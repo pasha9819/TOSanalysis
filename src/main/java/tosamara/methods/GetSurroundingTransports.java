@@ -7,9 +7,10 @@ import network.Request;
 import tosamara.methods.json.Transport;
 import tosamara.util.TokenGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class GetSurroundingTransports implements Method {
+class GetSurroundingTransports implements Method {
     private Double latitude;
     private Double longitude;
     private Integer radius;
@@ -39,8 +40,12 @@ public class GetSurroundingTransports implements Method {
                 .appendParam("authkey", secretKey())
                 .build();
         String answer = r.getAnswer();
-        GetSurroundingTransports.ListWrapper wrapper = new Gson().fromJson(answer, GetSurroundingTransports.ListWrapper.class);
-        return wrapper.getTransportList();
+        try{
+            GetSurroundingTransports.ListWrapper wrapper = new Gson().fromJson(answer, GetSurroundingTransports.ListWrapper.class);
+            return wrapper.getTransportList();
+        }catch (Exception e){
+            return new ArrayList<>();
+        }
     }
 
     private static class ListWrapper{

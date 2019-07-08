@@ -10,9 +10,8 @@ import tosamara.classifiers.xml.route.simple.SimpleRoute;
 import tosamara.classifiers.xml.route.simple.SimpleRoutes;
 
 import javax.xml.bind.JAXB;
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 
 public class RouteGrabber extends Grabber {
     @Override
@@ -26,9 +25,9 @@ public class RouteGrabber extends Grabber {
     }
 
     @Override
-    public void updateAndLoad() {
+    public void downloadAndUpdate() {
         try {
-            new SimpleRouteGrabber().updateAndLoad();
+            new SimpleRouteGrabber().downloadAndUpdate();
             SimpleRoutes simpleList = new SimpleRouteParser().parseFromFile();
 
             Routes routes;
@@ -40,18 +39,12 @@ public class RouteGrabber extends Grabber {
                 routes = new RouteParser().parseFromFile();
             }
 
-            HashMap<Integer, Route> routeMap = new HashMap<>();
-
             for (Route route : routes.getList()){
                 SimpleRoute s = simpleList.getByKR_ID(route.getKR_ID());
                 route.setAffiliationID(s.getAffiliationID());
-                // 1 == MUNICIPAL
-                if (route.getAffiliationID() == 1){
-                    routeMap.put(route.getKR_ID(), route);
-                }
             }
             save(routes);
-            RouteClassifier.routes = routeMap;
+            RouteClassifier.update();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Couldn't update and load Route info");

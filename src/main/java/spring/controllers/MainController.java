@@ -30,14 +30,14 @@ public class MainController {
     public MainController(AccuracyRepo accuracyRepo) {
         Updater.update(false);
         this.accuracyRepo = accuracyRepo;
-        try{
+        /*try{
             for (int id : observed) {
                 AccuracyTimer t = new AccuracyTimer(id);
                 t.start();
             }
         }catch (NullPointerException e){
             e.printStackTrace();
-        }
+        }*/
     }
 
     @ResponseBody
@@ -85,7 +85,6 @@ public class MainController {
             @RequestParam(name = "route_id") Integer routeId,
             @RequestParam(name = "start") String startStr,
             @RequestParam(name = "end") String endStr){
-
         Time start = parseTime(startStr);
         Time end = parseTime(endStr);
         if (stopId == null || routeId == null || start == null || end == null){

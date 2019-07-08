@@ -1,46 +1,33 @@
 package tosamara.classifiers;
 
-import tosamara.classifiers.xml.route.full.Route;
+import tosamara.classifiers.grabbers.StopGrabber;
+import tosamara.classifiers.parsers.StopParser;
 import tosamara.classifiers.xml.stop.Stop;
+import tosamara.classifiers.xml.stop.Stops;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import static tosamara.classifiers.xml.route.full.Route.TransportType.BUS;
-import static tosamara.classifiers.xml.route.full.Route.TransportType.TRAM;
-import static tosamara.classifiers.xml.route.full.Route.TransportType.TROL;
 
 public class StopClassifier {
-    public static HashMap<Integer, Stop> stops;
-
-    public static Stop findById(Integer KS_ID){
-        return stops.get(KS_ID);
+    private static HashMap<Integer, Stop> stopMap;
+    static {
+        update();
+        if (stopMap == null){
+            System.err.println("Couldn't load StopClassifier from local sources");
+            System.exit(-1);
+        }
     }
 
-    public static List<Route> getRoutesByStopId(Integer KS_ID){
-        List<Route> routes = new ArrayList<>();
-        Stop stop = StopClassifier.findById(KS_ID);
-        if (stop == null){
-            return routes;
-        }
-        String[] busNumbers = stop.getBusesMunicipal().split(", ");
-        String[] tramNumbers = stop.getTrams().split(", ");
-        String[] trolNumbers = stop.getTrolleybuses().split(", ");
+    public static Stop findById(Integer KS_ID){
+        return stopMap.get(KS_ID);
+    }
 
-        String[][] numbers = {busNumbers, tramNumbers, trolNumbers};
-        Route.TransportType[] types = {BUS, TRAM, TROL};
+    public static void update(){
+        Stops stops = new StopParser().parseFromFile();
+        HashMap<Integer, Stop> map = new HashMap<>();
 
-        for (int i = 0; i < numbers.length; i++) {
-            for(String s : numbers[i]){
-                List<Route> routeList = RouteClassifier.findByNumber(s, types[i]);
-                for (Route r: routeList){
-                    if (r.getStopIdList().contains(KS_ID)){
-                        routes.add(r);
-                    }
-                }
-            }
+        for (Stop stop : stops.getList()){
+            map.put(stop.getKS_ID(), stop);
         }
-        return routes;
+        stopMap = map;
     }
 }

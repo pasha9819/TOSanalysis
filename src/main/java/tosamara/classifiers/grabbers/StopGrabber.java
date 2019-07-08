@@ -2,14 +2,11 @@ package tosamara.classifiers.grabbers;
 
 import tosamara.Configuration;
 import tosamara.classifiers.StopClassifier;
-import tosamara.classifiers.parsers.StopParser;
-import tosamara.classifiers.xml.stop.Stop;
 import tosamara.classifiers.xml.stop.Stops;
 
 import javax.xml.bind.JAXB;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 
 public class StopGrabber extends Grabber{
     @Override
@@ -23,7 +20,7 @@ public class StopGrabber extends Grabber{
     }
 
     @Override
-    public void updateAndLoad() {
+    public void downloadAndUpdate() {
         try {
             Stops stops;
             try{
@@ -31,15 +28,10 @@ public class StopGrabber extends Grabber{
                 stops = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))), Stops.class);
                 save(stops);
             }catch (Exception e){
-                System.err.println("Couldn't load Stop info from tosamara.ru! [Data was loaded from local sources]");
-                stops = new StopParser().parseFromFile();
+                System.err.println("Couldn't load Stop info from tosamara.ru! [Data will be loaded from local sources]");
             }
 
-            HashMap<Integer, Stop> stopMap = new HashMap<>();
-            for (Stop stop : stops.getList()){
-                stopMap.put(stop.getKS_ID(), stop);
-            }
-            StopClassifier.stops = stopMap;
+            StopClassifier.update();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Couldn't update and load Stop info");

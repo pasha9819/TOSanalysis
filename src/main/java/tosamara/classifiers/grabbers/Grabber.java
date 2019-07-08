@@ -12,7 +12,7 @@ public abstract class Grabber {
 
     protected abstract String getPath();
 
-    public abstract void updateAndLoad();
+    public abstract void downloadAndUpdate();
 
     protected String downloadXml() throws NoSuchMethodException {
         String url = getURL();

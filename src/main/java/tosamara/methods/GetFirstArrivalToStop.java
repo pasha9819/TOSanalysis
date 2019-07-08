@@ -9,9 +9,10 @@ import tosamara.classifiers.xml.stop.Stop;
 import tosamara.methods.json.ArrivalToStop;
 import tosamara.util.TokenGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class GetFirstArrivalToStop implements Method {
+class GetFirstArrivalToStop implements Method {
     private Integer KS_ID;
     private Integer count;
 
@@ -36,9 +37,10 @@ public class GetFirstArrivalToStop implements Method {
                 .build();
 
         String answer = r.getAnswer();
-        ListWrapper wrapper = new Gson().fromJson(answer, ListWrapper.class);
-        for (ArrivalToStop a : wrapper.getArrivalList()){
-            Stop stop;
+        try{
+            ListWrapper wrapper = new Gson().fromJson(answer, ListWrapper.class);
+            for (ArrivalToStop a : wrapper.getArrivalList()){
+                Stop stop;
             /*
                 If transport near the previous stop, then change next stop to previous stop
                 it is need, because forecast are late and stops - it is point on map,
@@ -46,16 +48,19 @@ public class GetFirstArrivalToStop implements Method {
                 Also, average update of data on ToSamaraServer = 30 sec, and transport can
                 drive the stop in less than 30 seconds.
              */
-            if (a.getSpanLength() - a.getRemainingLength() < 51){
-                stop = a.getPrevStop();
-                a.setRemainingLength(a.getRemainingLength() - a.getSpanLength());
-                a.setNextStopId(stop.getKS_ID());
-            }else {
-                stop = StopClassifier.findById(a.getNextStopId());
+                if (a.getSpanLength() - a.getRemainingLength() < 51){
+                    stop = a.getPrevStop();
+                    a.setRemainingLength(a.getRemainingLength() - a.getSpanLength());
+                    a.setNextStopId(stop.getKS_ID());
+                }else {
+                    stop = StopClassifier.findById(a.getNextStopId());
+                }
+                a.setStop(stop);
             }
-            a.setStop(stop);
+            return wrapper.getArrivalList();
+        }catch (Exception e){
+            return new ArrayList<>();
         }
-        return wrapper.getArrivalList();
     }
 
     private static class ListWrapper{

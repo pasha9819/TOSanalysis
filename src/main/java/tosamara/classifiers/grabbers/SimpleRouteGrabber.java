@@ -18,7 +18,7 @@ public class SimpleRouteGrabber extends Grabber {
     }
 
     @Override
-    public void updateAndLoad() {
+    public void downloadAndUpdate() {
         try {
             String xml = downloadXml();
             SimpleRoutes s = JAXB.unmarshal(new ByteArrayInputStream(xml.getBytes()), SimpleRoutes.class);
