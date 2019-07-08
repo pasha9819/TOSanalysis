@@ -23,7 +23,6 @@ public class StopClassifier {
     public static void update(){
         Stops stops = new StopParser().parseFromFile();
         HashMap<Integer, Stop> map = new HashMap<>();
-
         for (Stop stop : stops.getList()){
             map.put(stop.getKS_ID(), stop);
         }

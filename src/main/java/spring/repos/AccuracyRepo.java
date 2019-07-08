@@ -1,13 +1,11 @@
 package spring.repos;
 
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import spring.entity.*;
+import spring.entity.Accuracy;
+import spring.entity.AccuracyPK;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
 
