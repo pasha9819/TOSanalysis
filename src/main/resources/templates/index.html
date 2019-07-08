@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Точность прогноза</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script type="text/javascript"  src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script type="text/javascript" src="/static/script.js"></script>
+</head>
+<body>
+
+    <div class="main">
+        <div class="tools">
+            <div class="tool">
+                <p><label for="stop">Остановка:</label></p>
+                <select id="stop" onchange="loadRoutes()">
+
+                </select>
+            </div>
+
+            <div class="tool">
+                <p><label for="route">Маршрут:</label></p>
+                <select id="route" onchange="loadData()">
+
+                </select>
+            </div>
+
+            <div class="tool time_tool">
+                <p>
+                    <label for="time">Время: </label>
+                    <span id="time_value"></span>
+                </p>
+                <p>
+                    <input id="time" type="range" value="1" min="1" max="4" step="1">
+                </p>
+            </div>
+        </div>
+        <div class="chart">
+            <div id="chartContainer">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
