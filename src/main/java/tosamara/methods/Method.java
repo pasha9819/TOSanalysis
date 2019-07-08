@@ -1,5 +1,12 @@
 package tosamara.methods;
 
+/**
+ * Base interface of object, which encapsulates call ToSamara API methods
+ */
 public interface Method {
-    String secretKey();
+    /**
+     * Generate auth key for access to ToSamara API methods
+     * @return generated key
+     */
+    String authKey();
 }

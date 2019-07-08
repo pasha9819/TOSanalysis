@@ -1,5 +1,8 @@
 package tosamara;
 
+/**
+ * Class with constant path's and url's.
+ */
 public abstract class Configuration {
     public static final String KEY_PATH = "src/main/resources/key.dat";
 

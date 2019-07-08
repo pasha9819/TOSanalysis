@@ -10,6 +10,9 @@ import tosamara.util.TokenGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Encapsulates call to server getSurroundingTransport method
+ */
 class GetSurroundingTransports implements Method {
     private Double latitude;
     private Double longitude;
@@ -24,7 +27,7 @@ class GetSurroundingTransports implements Method {
     }
 
     @Override
-    public String secretKey() {
+    public String authKey() {
         return TokenGenerator.getToken(latitude, longitude, radius, count);
     }
 
@@ -37,7 +40,7 @@ class GetSurroundingTransports implements Method {
                 .appendParam("COUNT", count)
                 .appendParam("os", "android")
                 .appendParam("clientid", "BelyaevPI")
-                .appendParam("authkey", secretKey())
+                .appendParam("authkey", authKey())
                 .build();
         String answer = r.getAnswer();
         try{

@@ -7,7 +7,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * Wrapper for generating the secret key depending on the ToSamara API method being called.
+ */
 public abstract class TokenGenerator {
+    /**
+     * Key for access to ToSamara API
+     */
     private static String SECRET_KEY;
 
     static {
@@ -18,10 +24,20 @@ public abstract class TokenGenerator {
         }
     }
 
+    /**
+     * Decode string by SHA-1 algorithm.
+     * @param str string for encoding
+     * @return encoded string
+     */
     private static String getSHA(String str)  {
         return DigestUtils.sha1Hex(str);
     }
 
+    /**
+     * Build string for encoding.
+     * @param arg objects for encoding
+     * @return encoded string
+     */
     public static String getToken(Object... arg) {
         StringBuilder b = new StringBuilder();
         for (Object o : arg){

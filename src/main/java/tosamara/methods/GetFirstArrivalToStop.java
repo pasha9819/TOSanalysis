@@ -12,6 +12,9 @@ import tosamara.util.TokenGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Encapsulates call to server getFirstArrivalToStop method
+ */
 class GetFirstArrivalToStop implements Method {
     private Integer KS_ID;
     private Integer count;
@@ -22,7 +25,7 @@ class GetFirstArrivalToStop implements Method {
     }
 
     @Override
-    public String secretKey() {
+    public String authKey() {
         return TokenGenerator.getToken(KS_ID, count);
     }
 
@@ -33,7 +36,7 @@ class GetFirstArrivalToStop implements Method {
                 .appendParam("COUNT", count)
                 .appendParam("os", "android")
                 .appendParam("clientid", "BelyaevPI")
-                .appendParam("authkey", secretKey())
+                .appendParam("authkey", authKey())
                 .build();
 
         String answer = r.getAnswer();

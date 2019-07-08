@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import spring.Application;
 import spring.entity.Accuracy;
 import spring.repos.AccuracyRepo;
 import tosamara.classifiers.RouteClassifier;
@@ -20,26 +21,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * Spring controller class
+ */
 @Controller
 public class MainController {
+    /**
+     * Stops for which data is collected
+     */
     private static final int[] observed = new int[]{872, 222, 218, 813, 1159, 1740, 329};
 
+    /**
+     * Database repository. (<code> table = "accuracy.accuracy" </code>)
+     */
     private final AccuracyRepo accuracyRepo;
 
+    /**
+     * Create object, update classifiers and
+     * start data fetching (if <code>Application.DATA_FETCHING == true</code>)
+     * @param accuracyRepo injected database repository
+     */
     @Autowired
     public MainController(AccuracyRepo accuracyRepo) {
         Updater.update(false);
         this.accuracyRepo = accuracyRepo;
-        /*try{
-            for (int id : observed) {
-                AccuracyTimer t = new AccuracyTimer(id);
-                t.start();
+        if (Application.DATA_FETCHING){
+            try{
+                for (int id : observed) {
+                    new AccuracyTimer(id).start();
+                }
+            }catch (NullPointerException e){
+                e.printStackTrace();
             }
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }*/
+        }
     }
 
+    /**
+     * Return routes going through the stop.
+     * @param id stop id
+     * @return HTML-text for combo box
+     */
     @ResponseBody
     @GetMapping(path = "/getRouteByStop", produces = MediaType.TEXT_HTML_VALUE)
     public String getRouteList(@RequestParam(name = "stop_id") Integer id){
@@ -65,6 +86,11 @@ public class MainController {
         return b.toString();
     }
 
+    /**
+     * Return title of observed stops.
+     * @return HTML-text for combo box
+     * @see MainController#observed
+     */
     @ResponseBody
     @GetMapping(path = "/getObservedStops", produces = MediaType.TEXT_HTML_VALUE)
     public String getObservedStops(){
@@ -78,6 +104,14 @@ public class MainController {
         return b.toString();
     }
 
+    /**
+     * Return data for ChartJS graphic.
+     * @param stopId stop identifier
+     * @param routeId route identifier
+     * @param startStr start time of observation
+     * @param endStr end time of observation
+     * @return JSON-array [{x: x1, y: y1}, {x: x2, y: y2}, ...]
+     */
     @ResponseBody
     @GetMapping(path = "/getAccuracyData", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<DataPoint> getData(
@@ -100,6 +134,11 @@ public class MainController {
         return data;
     }
 
+    /**
+     * Parse <code>Time</code> from string.
+     * @param str parsed string
+     * @return Time object or null if unable to convert string
+     */
     private Time parseTime(String str){
         if (str == null){
             return null;

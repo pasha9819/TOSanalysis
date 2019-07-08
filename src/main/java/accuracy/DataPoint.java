@@ -1,5 +1,10 @@
 package accuracy;
 
+/**
+ * Point for ChartJS data
+ *
+ * @see spring.controllers.MainController#getData(Integer, Integer, String, String)
+ */
 public class DataPoint {
     private double x, y;
 
