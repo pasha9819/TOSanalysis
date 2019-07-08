@@ -38,4 +38,9 @@ public class Request {
             return "";
         }
     }
+
+    @Override
+    public String toString() {
+        return "Request: " + url;
+    }
 }
