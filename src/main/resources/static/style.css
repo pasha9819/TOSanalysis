@@ -24,6 +24,7 @@ body{
     width: 100%;
     display: flex;
     justify-content: center;
+    margin-top: 5px;
 }
 
 p {
@@ -32,7 +33,7 @@ p {
 }
 
 .tool{
-    width: 300px;
+    width: 180px;
     font-size: 18px;
     margin-top: 5px;
 }
@@ -47,4 +48,19 @@ p {
 
 #myChart{
     background-color: white;
+}
+
+
+.ui-slider-horizontal .ui-slider-handle {
+    top: -.15em;
+    margin-left: -.35em;
+}
+
+.ui-slider-horizontal {
+    height: 0.5em;
+}
+
+.ui-slider .ui-slider-handle {
+    width: 0.8em;
+    height: 0.8em;
 }

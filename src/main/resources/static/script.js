@@ -2,51 +2,47 @@ document.addEventListener("DOMContentLoaded", function(event){
     window.onresize = function() {
         loadData();
     };
-    var slider = document.getElementById("time");
-    var output = document.getElementById("time_value");
-    output.innerHTML = getTimeInterval(slider.value);
 
-    slider.oninput = function() {
-        output.innerHTML = getTimeInterval(this.value);
-        loadData();
-    };
     loadStops();
+    $( function() {
+        var sliderDiv = $( "#slider-range" );
+        sliderDiv.slider({
+            range: true,
+            min: 11,
+            max: 48,
+            values: [ 11,48 ],
+            slide: function( event, ui ) {
+                sliderDiv.slider( "values", [ ui.values[0], ui.values[1] ] );
+                $( "#time_value" ).text( parseTime(ui.values[0]) + " - " + parseTime(ui.values[1]));
+                loadData();
+            }
+        });
+
+        $( "#time_value" ).text(
+            parseTime(sliderDiv.slider("values", 0))
+            + " - "
+            + parseTime(sliderDiv.slider("values", 1)));
+    } );
 });
 
-function getStartTime(val) {
-    var v = Number(val);
-    var answer;
-    if (v === 1) {
-        answer = "05";
-    }else if (v === 2) {
-        answer = "09";
-    }else if (v === 3) {
-        answer = "15";
-    }else{
-        answer = "19";
-    }
-    answer += ":00";
-    return answer;
-}
 
-function getEndTime(val) {
-    var v = Number(val);
-    var answer;
-    if (v === 1) {
-        answer = "08";
-    }else if (v === 2) {
-        answer = "14";
-    }else if (v === 3) {
-        answer = "18";
-    }else{
-        answer = "23";
-    }
-    answer += ":59";
-    return answer;
-}
 
-function getTimeInterval(val){
-    return getStartTime(val) + " - " + getEndTime(val);
+function parseTime(timeValue) {
+    if (Number(timeValue) === 48){
+        return "23:59";
+    }
+    var hour = Math.floor( Number(timeValue) / 2 );
+    var answer = "";
+    if (hour < 10) {
+        answer = "0";
+    }
+    answer += hour + ":";
+    if (Number(timeValue) % 2 === 1) {
+        answer += "30";
+    }else {
+        answer += "00";
+    }
+    return answer;
 }
 
 function loadStops() {
@@ -84,9 +80,9 @@ function loadRoutes() {
 function loadData() {
     var stopId = $("select[id='stop']").val();
     var routeId = $("select[id='route']").val();
-    var time = $("input[id='time']").val();
-    var start = getStartTime(time) + ":00";
-    var end = getEndTime(time) + ":59";
+    var timeValues = $( "#slider-range" ).slider( "values" );
+    var start = parseTime(timeValues[0]);
+    var end = parseTime(timeValues[1]);
     $.ajax({
         url: "getAccuracyData",
         type: "GET",
@@ -129,14 +125,17 @@ function  drawGraphic(points) {
                 radius: 5,
                 data: points
             },
-            {
-                type: "line",
-                radius: 1,
-                backgroundColor: 'rgba(0,0,0,1)',
-                data: diag //[{x: 0, y:0}, {x: max, y:max}]
-            }]
+                {
+                    type: "line",
+                    radius: 1,
+                    backgroundColor: 'rgba(0,0,0,1)',
+                    data: diag //[{x: 0, y:0}, {x: max, y:max}]
+                }]
         },
         options: {
+            animation:{
+                duration: 0
+            },
             events: [],
             legend: {
                 display: false
@@ -152,7 +151,7 @@ function  drawGraphic(points) {
                     scaleLabel: {
                         display: true,
                         fontSize: 18,
-                        labelString: "Реальное время"
+                        labelString: "Реальное время (c)"
                     }
                 }],
                 yAxes: [{
@@ -160,7 +159,7 @@ function  drawGraphic(points) {
                     scaleLabel: {
                         display: true,
                         fontSize: 18,
-                        labelString: "Прогноз"
+                        labelString: "Прогноз (c)"
                     }
                 }]
             }
